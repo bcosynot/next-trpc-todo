@@ -48,7 +48,7 @@ export const mergeRouters = t.mergeRouters;
 export const authedProcedure = t.procedure.use(function isAuthed(opts) {
   const user = opts.ctx.session?.user;
 
-  if (!user?.name) {
+  if (!user?.username) {
     throw new TRPCError({ code: 'UNAUTHORIZED' });
   }
 
@@ -56,7 +56,7 @@ export const authedProcedure = t.procedure.use(function isAuthed(opts) {
     ctx: {
       user: {
         ...user,
-        name: user.name,
+        name: user.username,
       },
     },
   });

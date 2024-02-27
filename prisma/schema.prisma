@@ -12,19 +12,32 @@ generator client {
   provider = "prisma-client-js"
 }
 
-enum PosterSource {
-  RAW
-  GITHUB
-}
-
-model Post {
-  id     String       @id @default(uuid())
-  name   String
-  text   String
-  source PosterSource @default(RAW)
+model Task {
+  id           String    @id @default(uuid())
+  title        String
+  description  String?
+  creator      User      @relation(fields: [creatorId], references: [id])
+  creatorId    String
+  done         Boolean   @default(false)
+  doneAt       DateTime?
+  dueDate      DateTime?
+  assignedTo   User?     @relation(name: "assignedToRelation", fields: [assignedToId], references: [id])
+  assignedToId String?
 
   // To return `Date`s intact through the API we need to add data transformers
   // https://trpc.io/docs/v11/data-transformers
   createdAt DateTime @unique @default(now())
   updatedAt DateTime @unique @default(now())
+}
+
+model User {
+  id            String   @id @default(cuid())
+  username      String   @unique
+  password      String
+  createdAt     DateTime @default(now()) @map(name: "created_at")
+  updatedAt     DateTime @updatedAt @map(name: "updated_at")
+  tasks         Task[]
+  assignedTasks Task[]   @relation(name: "assignedToRelation")
+
+  @@map(name: "users")
 }
